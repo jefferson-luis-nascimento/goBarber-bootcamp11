@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useContext } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -8,7 +8,7 @@ import logo from '../../assets/logo.svg';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
-import { AuthContext } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 import { Container, Content, Background } from './styles';
 import Input from '../../components/Input';
@@ -22,7 +22,7 @@ interface SignInFormData {
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { user, signIn } = useContext(AuthContext);
+  const { user, signIn } = useAuth();
 
   console.log(user);
 
@@ -42,7 +42,8 @@ const SignIn: React.FC = () => {
         });
 
         const { email, password } = data;
-        signIn({ email, password });
+
+        await signIn({ email, password });
       } catch (error) {
         const errors = getValidationErrors(error);
 
