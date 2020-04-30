@@ -8,7 +8,7 @@ import React, {
 import { useField } from '@unform/core';
 import { IconBaseProps } from 'react-icons';
 
-import { Container } from './styles';
+import { Container, Error } from './styles';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -50,6 +50,7 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...rest }) => {
         defaultValue={defaultValue}
         {...rest}
       />
+      {error && <Error>{error}</Error>}
     </Container>
   );
 };
