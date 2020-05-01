@@ -9,6 +9,8 @@ import logo from '../../assets/logo.svg';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
+import { useToast } from '../../hooks/toast';
+
 import { Container, Content, AnimationContainer, Background } from './styles';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -16,27 +18,41 @@ import Button from '../../components/Button';
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: object): Promise<void> => {
-    try {
-      formRef.current?.setErrors({});
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Nome é obrigatório'),
-        email: Yup.string()
-          .email('E-mail inválido')
-          .required('E-mail é obrigatório'),
-        password: Yup.string().min(
-          6,
-          'A senha precisa ter no mínimo 6 caracteres',
-        ),
-      });
+  const { addToast } = useToast();
 
-      await schema.validate(data, { abortEarly: false });
-    } catch (error) {
-      const errors = getValidationErrors(error);
+  const handleSubmit = useCallback(
+    async (data: object): Promise<void> => {
+      try {
+        formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome é obrigatório'),
+          email: Yup.string()
+            .email('E-mail inválido')
+            .required('E-mail é obrigatório'),
+          password: Yup.string().min(
+            6,
+            'A senha precisa ter no mínimo 6 caracteres',
+          ),
+        });
 
-      formRef.current?.setErrors(errors);
-    }
-  }, []);
+        await schema.validate(data, { abortEarly: false });
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+
+          formRef.current?.setErrors(errors);
+        } else {
+          addToast({
+            type: 'error',
+            title: 'Erro no Cadastro',
+            description:
+              'Não foi possível fazer o cadastro, confirme seus dados e tente novamente',
+          });
+        }
+      }
+    },
+    [addToast],
+  );
 
   return (
     <Container>
