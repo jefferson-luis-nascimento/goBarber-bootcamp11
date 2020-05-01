@@ -23,7 +23,7 @@ interface SignInFormData {
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { user, signIn } = useAuth();
+  const { signIn } = useAuth();
 
   const { addToast } = useToast();
 
@@ -51,7 +51,12 @@ const SignIn: React.FC = () => {
 
           formRef.current?.setErrors(errors);
         } else {
-          addToast();
+          addToast({
+            type: 'error',
+            title: 'Erro no logon',
+            description:
+              'Não foi possível fazer o logon, confirme seus dados e tente novamente',
+          });
         }
       }
     },
