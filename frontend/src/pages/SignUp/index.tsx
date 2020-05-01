@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft, FiUser, FiMail, FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -11,17 +11,27 @@ import getValidationErrors from '../../utils/getValidationErrors';
 
 import { useToast } from '../../hooks/toast';
 
+import api from '../../services/api';
+
 import { Container, Content, AnimationContainer, Background } from './styles';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
+  const history = useHistory();
 
   const { addToast } = useToast();
 
   const handleSubmit = useCallback(
-    async (data: object): Promise<void> => {
+    async (data: SignUpFormData): Promise<void> => {
       try {
         formRef.current?.setErrors({});
         const schema = Yup.object().shape({
@@ -36,6 +46,22 @@ const SignUp: React.FC = () => {
         });
 
         await schema.validate(data, { abortEarly: false });
+
+        const { name, email, password } = data;
+
+        await api.post('/users', {
+          name,
+          email,
+          password,
+        });
+
+        addToast({
+          type: 'success',
+          title: 'Cadastro realizado com sucesso.',
+          description: 'Você já pode fazer seu logon no GoBarber',
+        });
+
+        history.push('/');
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -51,7 +77,7 @@ const SignUp: React.FC = () => {
         }
       }
     },
-    [addToast],
+    [addToast, history],
   );
 
   return (
