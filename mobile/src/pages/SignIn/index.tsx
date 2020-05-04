@@ -18,6 +18,8 @@ import logoImg from '../../assets/logo.png';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
+import { useAuth } from '../../hooks/auth';
+
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
@@ -40,38 +42,41 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSubmit = useCallback(async (data: SignInFormData): Promise<
-    void
-  > => {
-    try {
-      formRef.current?.setErrors({});
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .email('E-mail inválido')
-          .required('E-mail é obrigatório'),
-        password: Yup.string().required('A senha é obrigatória'),
-      });
+  const { signIn } = useAuth();
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+  const handleSubmit = useCallback(
+    async (data: SignInFormData): Promise<void> => {
+      try {
+        formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .email('E-mail inválido')
+            .required('E-mail é obrigatório'),
+          password: Yup.string().required('A senha é obrigatória'),
+        });
 
-      const { email, password } = data;
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // await signIn({ email, password });
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
+        const { email, password } = data;
 
-        formRef.current?.setErrors(errors);
-      } else {
-        Alert.alert(
-          'Erro no logon',
-          'Não foi possível fazer o logon, confirme seus dados e tente novamente',
-        );
+        await signIn({ email, password });
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+
+          formRef.current?.setErrors(errors);
+        } else {
+          Alert.alert(
+            'Erro no logon',
+            'Não foi possível fazer o logon, confirme seus dados e tente novamente',
+          );
+        }
       }
-    }
-  }, []);
+    },
+    [signIn],
+  );
 
   return (
     <>
