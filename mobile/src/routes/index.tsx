@@ -1,4 +1,4 @@
-/* import React from 'react';
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import SignIn from '../pages/SignIn';
@@ -16,4 +16,3 @@ const AuthRoutes: React.FC = () => {
 };
 
 export default AuthRoutes;
- */
