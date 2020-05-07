@@ -17,7 +17,7 @@ describe('CreateSession', () => {
       fakeHashProvider,
     );
 
-    await createUser.execute({
+    const user = await createUser.execute({
       name: 'John Doe',
       email: 'johndoe@example.com',
       password: '123456',
@@ -34,6 +34,7 @@ describe('CreateSession', () => {
     });
 
     expect(session).toHaveProperty('token');
+    expect(session.user).toEqual(user);
   });
 
   it('should not be able to create a session with invalid email', async () => {
